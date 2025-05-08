@@ -1,0 +1,3 @@
+<launch>
+  <node name="master_node" pkg="navigation" type="master_node" output="screen" args="$(find navigation)/resources/waypoints_with_orientations.txt"/>
+</launch>

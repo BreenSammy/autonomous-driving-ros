@@ -1,0 +1,4 @@
+<launch>
+	<node pkg="semantic_depth_to_laserscan" name="semantic_depth_to_laserscan" type="semantic_depth_to_laserscan_node" >
+	</node>
+</launch>

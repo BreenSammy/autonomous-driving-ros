@@ -1,0 +1,26 @@
+<launch>
+  <!-- Launch unity simulation -->
+  <include file="$(find simulation)/launch/simulation.launch" >
+  </include>
+  <!-- Depth Image Proc to generate point cloud from depth image -->
+  <include file="$(find car_bringup)/launch/depth_image_proc.launch" >
+  </include>
+  <!-- Node that converts point cloud to laser scan -->
+  <include file="$(find car_bringup)/launch/pointcloud_to_laserscan.launch" >
+  </include>
+  <!-- Launch map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find car_bringup)/map_mod.yaml" >
+    <param name="frame_id" value="world" />
+  </node>
+  <!-- Launch move base with global and local planning -->
+  <include file="$(find navigation)/launch/move_base.launch" >
+  </include>
+  <!-- Launch traffic light server -->
+  <node name="traffic_light_server" pkg="traffic_light_detector" type="traffic_light_server" >
+  </node>
+  <!-- Launch controller -->
+  <node name="controller_node" pkg="controller_pkg" type="controller_node"/>
+  <!-- Launch the waypoint publishing master node -->
+  <include file="$(find navigation)/launch/master_node.launch" >
+  </include>
+</launch>

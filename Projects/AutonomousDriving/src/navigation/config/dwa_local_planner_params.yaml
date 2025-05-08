@@ -1,0 +1,42 @@
+DWAPlannerROS:
+  max_vel_x: 10  # Maximum forward velocity
+  min_vel_x: -1  # Minimum forward velocity
+  max_vel_trans: 10
+  max_vel_y: 0
+  min_vel_y: 0
+  max_vel_theta: 1.0  # Maximum rotational velocity
+  min_vel_theta: -1.0  # Minimum rotational velocity
+  acc_lim_x: 10  # Maximum acceleration in x
+  acc_lim_theta: 3.2  # Maximum rotational acceleration
+  xy_goal_tolerance: 0.5  # Goal tolerance in x and y
+  yaw_goal_tolerance: 0.2  # Goal tolerance in yaw
+  min_in_place_vel_theta: 0  # Minimum in-place rotational velocity
+
+
+  # Velocity samples
+  # vx_samples: 20  # Number of samples for x velocity
+  # vtheta_samples: 20  # Number of samples for theta velocity
+
+  # Trajectory parameters
+  sim_time: 2  # Simulation time
+  # sim_granularity: 0.05  # Granularity of the trajectory
+  # angular_sim_granularity: 0.025  # Angular granularity of the trajectory
+
+  # Path distance bias (weight for distance to path)
+  path_distance_bias: 0.1
+  goal_distance_bias: 0.2
+  occdist_scale: 0.3
+
+  # Obstacle cost parameters
+  # occdist_scale: 0.01  # Obstacle cost scale
+  # forward_point_distance: 0.5
+
+  # Stop tolerance
+  # stop_time_buffer: 0.2
+
+  # Oscillation prevention
+  # oscillation_reset_dist: 0.05
+
+  # Additional Parameters
+  # prune_plan: true
+  # restore_defaults: false
