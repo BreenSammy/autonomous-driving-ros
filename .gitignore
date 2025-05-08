@@ -4,5 +4,5 @@ Projects/AutonomousDriving/build
 Projects/AutonomousDriving/devel/
 Projects/AutonomousDriving/logs/
 Projects/AutonomousDriving/.catkin_workspace/
-Projects/RosDockerSetup/
 .vscode/
+.env/

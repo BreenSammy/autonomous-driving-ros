@@ -1,0 +1,28 @@
+services:
+  dev:
+    build:
+        context: ../AutonomousDriving
+        dockerfile: ../RosDockerSetup/Dockerfile
+        args:
+          USER_ID: ${USER_ID:-0}
+          GROUP_ID: ${GROUP_ID:-0}
+    image: osrf/ros:noetic-desktop-full
+    container_name: ros_noetic
+    network_mode: "host"           # access to host's network
+    stdin_open: true               # docker run -i
+    tty: true                      # docker run -t
+    devices:
+      - /dev/dri:/dev/dri
+    environment:
+      - DISPLAY=${DISPLAY}             # Pass the display for GUI
+      - QT_X11_NO_MITSHM=1             # Needed by QT programs
+      - XAUTHORITY=/tmp/.docker.xauth
+    volumes:
+       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+       - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+       - ../AutonomousDriving/src:/home/ros/workspace/src
+       - ../data:/home/ros/data
+       - ../AutonomousDriving/devel/:/home/ros/workspace/devel
+    group_add:
+      - "video"
+    privileged: true  # Optional but can help with GPU access
