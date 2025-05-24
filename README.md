@@ -19,7 +19,7 @@ sudo apt install ros-noetic-map-server
 sudo apt install ros-noetic-teb-local-planner
 ```
 4. Build the project with catkin build in the "Projects/AutonomousDriving/" folder
-5. Download the Unity Environment: https://syncandshare.lrz.de/getlink/fiEg9ocZ6Pc5iuEa4QqN1b/
+5. Download the [Unity Environment](https://github.com/BreenSammy/autonomous-driving-ros/releases/download/v.0.0.1/simulation.zip)
 6. Unzip the Unity file and copy the files to .../devel/lib/simulation/ and make Car_build.x86_64 runnable
    
 ## Running the project
