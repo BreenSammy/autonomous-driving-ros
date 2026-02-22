@@ -42,30 +42,40 @@ public:
       twist_publishers_.insert(std::make_pair(header.name, nh_.advertise<geometry_msgs::TwistStamped>(header.name + "/twist", 10)));
     }    
 
+    if(last_time_stamp == header.timestamp + time_offset)
+    // Avoid duplicated time stamps
+    {
+      return false;
+    }
+    else
+    {
+      last_time_stamp = header.timestamp + time_offset;
+    }
+
     geometry_msgs::PoseStamped pose_msg;
-    pose_msg.header.frame_id = "body"; //"odom_nav";
-    pose_msg.header.stamp = ros::Time(header.timestamp + time_offset);
+    pose_msg.header.frame_id = "world"; //"odom_nav";
+    pose_msg.header.stamp = ros::Time(last_time_stamp);
     
-    pose_msg.pose.position.x = px;
-    pose_msg.pose.position.y = pz;
+    pose_msg.pose.position.x = pz;
+    pose_msg.pose.position.y = -px;
     pose_msg.pose.position.z = py;
 
-    pose_msg.pose.orientation.x = -qx;
-    pose_msg.pose.orientation.y = -qz;
+    pose_msg.pose.orientation.x = -qz;
+    pose_msg.pose.orientation.y = qx;
     pose_msg.pose.orientation.z = -qy;
     pose_msg.pose.orientation.w = qw;
 
     geometry_msgs::TwistStamped twist_msg;
-    twist_msg.header.frame_id = "body"; //"odom_nav";
+    twist_msg.header.frame_id = "world"; //"odom_nav";
     twist_msg.header.stamp = pose_msg.header.stamp;
     
-    twist_msg.twist.linear.x = vx;    
-    twist_msg.twist.linear.y = vz;
+    twist_msg.twist.linear.x = vz;    
+    twist_msg.twist.linear.y = -vx;
     twist_msg.twist.linear.z = vy;
 
-    twist_msg.twist.angular.x = rx;
-    twist_msg.twist.angular.y = rz;
-    twist_msg.twist.angular.z = ry;
+    twist_msg.twist.angular.x = rz;
+    twist_msg.twist.angular.y = -rx;
+    twist_msg.twist.angular.z = -ry;
 
     pose_publishers_[header.name].publish(pose_msg);
     twist_publishers_[header.name].publish(twist_msg);
@@ -73,7 +83,7 @@ public:
     geometry_msgs::TransformStamped::Ptr tf(new geometry_msgs::TransformStamped);
     tf->header.stamp = pose_msg.header.stamp;
     tf->header.frame_id = "world";
-    tf->child_frame_id = "true_body";
+    tf->child_frame_id = "OurCar/INS";
 
     tf->transform.translation.x = pose_msg.pose.position.x;
     tf->transform.translation.y = pose_msg.pose.position.y;
@@ -85,6 +95,7 @@ public:
     tf->transform.rotation.w = pose_msg.pose.orientation.w;
 
     tf_broadcaster.sendTransform(*tf);
+    return true;
   }
 
 private:
@@ -92,4 +103,5 @@ private:
   std::unordered_map<std::string, ros::Publisher> twist_publishers_;
   tf2_ros::TransformBroadcaster tf_broadcaster;
   ros::NodeHandle nh_;
+  double last_time_stamp = 0.0;
 };

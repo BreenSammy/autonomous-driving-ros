@@ -1,16 +1,7 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(controller_pkg)
+add_compile_options(-std=c++11)
 
-include(CheckCXXCompilerFlag)
-
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-
-if(COMPILER_SUPPORTS_CXX11)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wl,--no-as-needed")
-elseif(COMPILER_SUPPORTS_CXX0X)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-endif()
 
 find_package(catkin REQUIRED COMPONENTS 
   roscpp 
@@ -20,11 +11,19 @@ find_package(catkin REQUIRED COMPONENTS
   mav_msgs
   eigen_conversions
   tf_conversions
+  simulation
 )
 
-catkin_package(CATKIN_DEPENDS 
+
+catkin_package(
+#  INCLUDE_DIRS include
+#  LIBRARIES controller_pkg
+#  CATKIN_DEPENDS mav_msgs roscpp std_msgs
+#  DEPENDS system_lib
+  CATKIN_DEPENDS 
+  simulation 
   roscpp 
-  std_msgs 
+  std_msgs
   mav_msgs 
   tf
   eigen_conversions
@@ -32,8 +31,13 @@ catkin_package(CATKIN_DEPENDS
 
 find_package(Eigen3)
 
-include_directories(${catkin_INCLUDE_DIRS})
+include_directories(
+# include
+  ${catkin_INCLUDE_DIRS}
+)
+
 
 add_executable(controller_node src/controller_node.cpp)
 add_dependencies(controller_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(controller_node ${catkin_LIBRARIES})
+

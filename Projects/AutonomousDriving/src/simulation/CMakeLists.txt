@@ -20,16 +20,22 @@ find_package(catkin REQUIRED COMPONENTS
 	std_msgs
 	tf
 	image_transport
-        fla_utils
-        fla_msgs
         cv_bridge
         message_generation
-        mav_msgs
 	)
 
+add_message_files(
+        FILES
+        VehicleControl.msg
+)
+generate_messages(
+        DEPENDENCIES
+        std_msgs
+)
+
 catkin_package(CATKIN_DEPENDS
-        mav_msgs
-	)
+        message_runtime        
+)
 
 include(ExternalProject)
 ExternalProject_Add(libsocket
@@ -48,13 +54,13 @@ include_directories(${catkin_INCLUDE_DIRS} tcpimage)
 
 add_subdirectory(tcpimage)
 
-add_executable(unity_ros src/unity_ros.cpp)
-add_executable(state_estimate_corruptor_node src/state_estimate_corruptor_node.cpp )
-add_executable(w_to_unity src/w_to_unity.cpp)
+add_executable(unity_TCP_stream_receiver src/unity_TCP_stream_receiver.cpp)
+add_executable(ROS_command_transmitter src/ROS_command_transmitter.cpp)
+add_executable(JSON_param_reader src/JSON_param_reader.cpp)
 
-target_link_libraries(unity_ros ${catkin_LIBRARIES} tcpstreamreader tcpimage)
-target_link_libraries(state_estimate_corruptor_node  ${catkin_LIBRARIES})
-target_link_libraries(w_to_unity ${catkin_LIBRARIES} socket++ -pthread)
+target_link_libraries(unity_TCP_stream_receiver ${catkin_LIBRARIES} tcpstreamreader tcpimage)
+target_link_libraries(ROS_command_transmitter ${catkin_LIBRARIES} socket++ -pthread)
+target_link_libraries(JSON_param_reader  ${catkin_LIBRARIES})
 
-add_dependencies(w_to_unity libsocket ${catkin_EXPORTED_TARGETS})
+add_dependencies(ROS_command_transmitter libsocket ${catkin_EXPORTED_TARGETS})
 

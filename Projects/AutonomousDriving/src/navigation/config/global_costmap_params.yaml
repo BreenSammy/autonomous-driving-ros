@@ -1,6 +1,6 @@
 global_costmap:
   update_frequency: 1.0
-  static_map: true  # Disable static map
+  static_map: false  # Disable static map
   rolling_window: false
   width: 400
   height: 400

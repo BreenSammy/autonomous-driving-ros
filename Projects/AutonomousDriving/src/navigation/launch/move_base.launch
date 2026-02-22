@@ -1,13 +1,39 @@
 <launch>
   <!-- Create static transformation for the odom topic -->
   <node pkg="tf2_ros" type="static_transform_publisher"
-    name="body_odom_broadcaster"      args="0 0 0 1.5708 0 0 /body /odom" />
+    name="body_odom_broadcaster"      args="0 0 0 1.5708 0 0 /OurCar/INS /odom" />
 
   <!-- Start odom rotator node that aligns the current_state_est with the car -->
-  <node name="odom_rotator_node" pkg="navigation" type="odometry_rotator_node" output="screen">
-      <remap from="input_odom" to="/current_state_est"/>
+    <node name="odom_rotator_node" pkg="navigation" type="odometry_rotator_node" output="screen">
+      <remap from="input_tf" to="/tf"/>
       <remap from="output_odom" to="/odom"/>
-  </node>
+    </node>
+
+  
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="sim_true_body"      args="0 0 0 0 0 0 /OurCar/INS /true_body" />
+
+  <!-- Rotate true_body 90 degrees around z-axis to align x-axis with the car -->
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="true_body_base_link"      args="0 0 0 0 0 0 /true_body /base_link" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="camera_to_body"      args="0 0 1.25 1.57 3.14 1.57 /base_link /camera" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="sim_left_camera"      args="0 0 0 0 0 0 /camera /OurCar/Sensors/RGBCameraLeft" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="sim_right_camera"      args="0 0 0 0 0 0 /camera /OurCar/Sensors/RGBCameraRight" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="depth_camera_to_body"      args="0 0 1.25 1.57 3.14 1.57 /base_link /depth_camera" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="sim_depth_camera"      args="0 0 0 0 0 0 /depth_camera /OurCar/Sensors/DepthCamera" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="world_to_map"      args="-140 -14 0 -1.570796 0 0 /world /world_map" />
 
   <node pkg="move_base" type="move_base" name="move_base" output="screen">
     <rosparam file="$(find navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" /> 

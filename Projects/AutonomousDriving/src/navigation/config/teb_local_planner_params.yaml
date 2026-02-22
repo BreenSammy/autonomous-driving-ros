@@ -2,10 +2,10 @@ TebLocalPlannerROS:
   odom_topic: odom
   map_frame: map
 
-  max_vel_x: 3
+  max_vel_x: 1
   max_vel_x_backwards: 0.5
   max_vel_theta: 2.0
-  acc_lim_x: 4.0
+  acc_lim_x: 5.0
   acc_lim_theta: 3.0
 
   min_in_place_vel_theta: 0.0

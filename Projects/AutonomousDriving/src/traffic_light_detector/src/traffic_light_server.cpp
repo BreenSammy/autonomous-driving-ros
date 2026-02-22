@@ -1,8 +1,8 @@
 #include "traffic_light_detector/traffic_light_server.h"
 
 TrafficLightDetector::TrafficLightDetector() : nh_{"~"}, it_{nh_}, rgb_received_{false}, semantic_received_{false} {
-    rgb_sub_ = nh_.subscribe("/realsense/rgb/left_image_raw", 1, &TrafficLightDetector::rgbCallback, this);
-    semantic_sub_ = nh_.subscribe("/unity_ros/OurCar/Sensors/SemanticCamera/image_raw", 1, &TrafficLightDetector::semanticCallback, this);
+    rgb_sub_ = nh_.subscribe("/Unity_ROS_message_Rx/OurCar/Sensors/RGBCameraLeft/image_raw", 1, &TrafficLightDetector::rgbCallback, this);
+    semantic_sub_ = nh_.subscribe("/Unity_ROS_message_Rx/OurCar/Sensors/SemanticCamera/image_raw", 1, &TrafficLightDetector::semanticCallback, this);
     cropped_rgb_pub_ = it_.advertise("/cropped_rgb_image", 1);
     cropped_semantic_pub_ = it_.advertise("/cropped_semantic_image", 1);
     ROS_INFO("Traffic Light Detector Initialized");
@@ -56,12 +56,17 @@ void TrafficLightDetector::semanticCallback(const sensor_msgs::ImageConstPtr& ms
 
 void TrafficLightDetector::processImages() {
     if (rgb_received_ && semantic_received_) {
-        if (rgb_cv_ptr_->image.size() == semantic_cv_ptr_->image.size()) {
-            rgb_received_ = false;
-            semantic_received_ = false;
-        } else {
-            ROS_ERROR("RGB and Semantic images are not the same size");
+        // If sizes differ, resize the semantic image to match the RGB image
+        if (rgb_cv_ptr_->image.size() != semantic_cv_ptr_->image.size()) {
+            // Need to resize image
+            cv::Mat resized_semantic;
+            cv::resize(semantic_cv_ptr_->image, resized_semantic, rgb_cv_ptr_->image.size(), 0, 0, cv::INTER_NEAREST);
+            semantic_cv_ptr_->image = resized_semantic;
         }
+
+        // Clear flags so next pair can be processed
+        rgb_received_ = false;
+        semantic_received_ = false;
     }
 }
 
@@ -97,7 +102,16 @@ std::string TrafficLightDetector::detectTrafficLight(const cv::Mat& rgb_img, con
 
 bool TrafficLightDetector::detectTrafficLightService(traffic_light_detector::DetectTrafficLight::Request &req, traffic_light_detector::DetectTrafficLight::Response &res) {
     if (rgb_cv_ptr_ && semantic_cv_ptr_) {
-        std::string command = detectTrafficLight(rgb_cv_ptr_->image, semantic_cv_ptr_->image);
+        // Ensure semantic mask matches RGB image size. If not, resize semantic to RGB.
+        cv::Mat rgb_img = rgb_cv_ptr_->image;
+        cv::Mat semantic_img = semantic_cv_ptr_->image;
+        if (rgb_img.size() != semantic_img.size()) {
+            cv::Mat resized_semantic;
+            cv::resize(semantic_img, resized_semantic, rgb_img.size(), 0, 0, cv::INTER_NEAREST);
+            semantic_img = resized_semantic;
+        }
+
+        std::string command = detectTrafficLight(rgb_img, semantic_img);
         res.status = command;
         return true;
     } else {

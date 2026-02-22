@@ -3,6 +3,8 @@
 
 #include <ros/console.h>
 
+#include <simulation/VehicleControl.h>
+
 #include <tf/transform_datatypes.h>
 #include <tf_conversions/tf_eigen.h>
 #include <eigen_conversions/eigen_msg.h>
@@ -54,14 +56,18 @@ class controllerNode{
 
 public:
   controllerNode():hz_(50.0){
-      // Get current state from the odometry used by move_base 
-      current_state_ = nh_.subscribe("odom", 1, &controllerNode::onCurrentState, this);
-      cmd_vel_sub_ = nh_.subscribe("cmd_vel", 1, &controllerNode::cmdVelCallback, this);
-      car_commands_ = nh_.advertise<mav_msgs::Actuators>("car_commands", 1);
-      timer_ = nh_.createTimer(ros::Rate(hz_), &controllerNode::controlLoop, this);
+    // Get current state from the odometry used by move_base 
+    current_state_ = nh_.subscribe("odom", 1, &controllerNode::onCurrentState, this);
+    cmd_vel_sub_ = nh_.subscribe("cmd_vel", 1, &controllerNode::cmdVelCallback, this);
+    //car_commands_ = nh_.advertise<mav_msgs::Actuators>("car_commands", 1);
+
+    car_commands_ = nh_.advertise<simulation::VehicleControl>("car_command", 1);
     
-      integrator_value_ = 0;
-      previous_error_ = 0;
+    timer_ = nh_.createTimer(ros::Rate(hz_), &controllerNode::controlLoop, this);
+    
+
+    integrator_value_ = 0;
+    previous_error_ = 0;
   }
 
   void cmdVelCallback(const geometry_msgs::Twist& cmd_vel) {
@@ -131,22 +137,30 @@ public:
     double turning_angle = K_p_omega * steering_angle_error;
     double braking = 0;
     
-    mav_msgs::Actuators msg;
+    //mav_msgs::Actuators msg;
+
+    simulation::VehicleControl msg;
+    msg.Throttle = acceleration_output; // Throttle value from -1 to 1, this is the torque applied to the motors
+    msg.Steering =  turning_angle; //Steering value from -1 to 1, in which: positive value <=> turning right
+    msg.Brake = braking; // Brake value from 0 to 1, this will apply brake torque to stop the car
+    msg.Reserved = 0.0f; // Not used!
 
     //call the traffic light detector service
-    msg.angular_velocities.resize(4);
-    msg.angular_velocities[0] = acceleration_output;  // Acceleration
-    msg.angular_velocities[1] = turning_angle;       // Turning angle
-    msg.angular_velocities[2] = braking;            // Braking
-    msg.angular_velocities[3] = 0;                   // Other (not used)*/
+    //msg.angular_velocities.resize(4);
+    //msg.angular_velocities[0] = ;  // Acceleration
+    //msg.angular_velocities[1] = ;       // Turning angle
+    //msg.angular_velocities[2] = ;            // Braking
+    //msg.angular_velocities[3] = 0;                   // Other (not used)*/
 
     car_commands_.publish(msg);
   }
 };
 
-int main(int argc, char** argv){
-  ros::init(argc, argv, "controller_node");
-  ROS_INFO_NAMED("controller", "Controller started!");
-  controllerNode n;
-  ros::spin();
+int main(int argc, char **argv)
+{
+    ros::init(argc, argv, "controller_pkg");
+    ros::init(argc, argv, "controller_node");
+    ROS_INFO_NAMED("controller", "Controller started!");
+    controllerNode n;
+    ros::spin();
 }

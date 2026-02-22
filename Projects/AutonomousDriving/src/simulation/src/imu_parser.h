@@ -7,6 +7,7 @@
 
 class IMUParser : public UnityStreamParser {
 public:
+
   IMUParser() : nh_("~") { };
 
   virtual bool ParseMessage(const UnityHeader& header, 
@@ -27,8 +28,10 @@ public:
       publishers_.insert(std::make_pair(header.name, nh_.advertise<sensor_msgs::Imu>(header.name, 10)));
     } 
 
+
     sensor_msgs::Imu imu_msg;
     imu_msg.header.frame_id = header.name;
+    
     imu_msg.header.stamp = ros::Time(header.timestamp + time_offset);
     imu_msg.angular_velocity.x = -gx;
     imu_msg.angular_velocity.y = -gz;
@@ -37,8 +40,9 @@ public:
     imu_msg.linear_acceleration.x = ax;
     imu_msg.linear_acceleration.y = az;
     imu_msg.linear_acceleration.z = ay;
-
+    
     publishers_[header.name].publish(imu_msg);
+    return true;
   }
 
 private:

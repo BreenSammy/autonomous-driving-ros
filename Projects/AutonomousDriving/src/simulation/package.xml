@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>simulation</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>Introduction to ROS</description>
   <maintainer email="markus.ryll@tum.de">drc</maintainer>
   <license>TODO</license>
@@ -13,11 +13,8 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>image_transport</build_depend> 
   <build_depend>tf</build_depend>
-  <build_depend>fla_utils</build_depend>
-  <build_depend>fla_msgs</build_depend>
   <build_depend>cv_bridge</build_depend>
   <build_depend>message_generation</build_depend>
-  <build_depend>mav_msgs</build_depend>
 
   <run_depend>geometry_msgs</run_depend>
   <run_depend>roscpp</run_depend>
@@ -26,10 +23,9 @@
   <run_depend>std_msgs</run_depend>
   <run_depend>image_transport</run_depend>
   <run_depend>tf</run_depend>
-  <run_depend>fla_msgs</run_depend>
+
   <run_depend>cv_bridge</run_depend>
-  <run_depend>message_generation</run_depend>
-  <run_depend>mav_msgs</run_depend>
+  <run_depend>message_runtime</run_depend>
 
   <export>
   </export>

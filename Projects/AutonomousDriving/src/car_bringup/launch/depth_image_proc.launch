@@ -5,8 +5,8 @@
   <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" />
 
   <node pkg="nodelet" type="nodelet" name="depth_image_proc_nodelet" args="load depth_image_proc/point_cloud_xyz nodelet_manager" output="screen">
-    <remap from="camera_info" to="/realsense/depth/camera_info"/>
-    <remap from="image_rect" to="/realsense/depth/image"/>
+    <remap from="camera_info" to="//Unity_ROS_message_Rx/OurCar/Sensors/DepthCamera/camera_info"/>
+    <remap from="image_rect" to="/Unity_ROS_message_Rx/OurCar/Sensors/DepthCamera/image_raw"/>
     <remap from="points" to="/point_cloud/points"/>
   </node>
 </launch>
