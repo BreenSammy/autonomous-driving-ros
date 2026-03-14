@@ -1,22 +1,27 @@
 <launch>
   <!-- Create static transformation for the odom topic -->
   <node pkg="tf2_ros" type="static_transform_publisher"
-    name="body_odom_broadcaster"      args="0 0 0 1.5708 0 0 /OurCar/INS /odom" />
+    name="world_odom_broadcaster"      args="0 0 0 0 0 0 /world /odom" />
 
   <!-- Start odom rotator node that aligns the current_state_est with the car -->
-    <node name="odom_rotator_node" pkg="navigation" type="odometry_rotator_node" output="screen">
+    <!-- <node name="odom_rotator_node" pkg="navigation" type="odometry_rotator_node" output="screen">
       <remap from="input_tf" to="/tf"/>
       <remap from="output_odom" to="/odom"/>
-    </node>
+    </node> -->
 
-  
+
+    <node name="odom_publisher_node" pkg="navigation" type="odom_publisher_node" output="screen">
+      <remap from="pose" to="/Unity_ROS_message_Rx/OurCar/CoM/pose"/>
+      <remap from="twist" to="/Unity_ROS_message_Rx/OurCar/CoM/twist"/>
+    </node>
+<!-- 
   <node pkg="tf2_ros" type="static_transform_publisher"
-        name="sim_true_body"      args="0 0 0 0 0 0 /OurCar/INS /true_body" />
+        name="sim_true_body"      args="0 0 0 0 0 0 /OurCar/INS /true_body" /> -->
 
   <!-- Rotate true_body 90 degrees around z-axis to align x-axis with the car -->
   <node pkg="tf2_ros" type="static_transform_publisher"
-        name="true_body_base_link"      args="0 0 0 0 0 0 /true_body /base_link" />
-
+        name="true_body_base_link"      args="0 0 0 0 0 0 /OurCar/INS /base_link" />
+0 0 
   <node pkg="tf2_ros" type="static_transform_publisher"
         name="camera_to_body"      args="0 0 1.25 1.57 3.14 1.57 /base_link /camera" />
 

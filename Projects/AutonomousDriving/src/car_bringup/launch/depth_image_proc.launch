@@ -10,5 +10,3 @@
     <remap from="points" to="/point_cloud/points"/>
   </node>
 </launch>
-
-<!-- -->

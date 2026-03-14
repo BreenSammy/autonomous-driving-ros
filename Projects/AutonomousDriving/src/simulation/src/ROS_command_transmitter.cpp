@@ -8,31 +8,30 @@
 #include "libsocket/inetclientdgram.hpp"
 #include "libsocket/exception.hpp"
 
-
-template<typename T>
-bool wait_for_param(const std::string& key, T& value, const T& default_val, double wait_duration = 5.0, double check_interval = 0.1)
+template <typename T>
+bool wait_for_param(const std::string &key, T &value, const T &default_val, double wait_duration = 5.0, double check_interval = 0.1)
 {
-    ros::Time start_time = ros::Time::now();
-    ros::Duration interval(check_interval);
+  ros::Time start_time = ros::Time::now();
+  ros::Duration interval(check_interval);
 
-    while (ros::ok())
+  while (ros::ok())
+  {
+    if (ros::param::get(key, value))
     {
-        if (ros::param::get(key, value))
-        {
-            ROS_INFO_STREAM("{Parameter Inquiry} [" << key << "]: " << value);
-            return true;
-        }
-
-        if ((ros::Time::now() - start_time).toSec() > wait_duration)
-        {
-            ROS_ERROR_STREAM("{Parameter Inquiry} ROS Parameter [" << key << "] not found after " << wait_duration << "s, using default value: " << default_val);
-            value = default_val;
-            return false;
-        }
-
-        interval.sleep();
+      ROS_INFO_STREAM("{Parameter Inquiry} [" << key << "]: " << value);
+      return true;
     }
-    return false;
+
+    if ((ros::Time::now() - start_time).toSec() > wait_duration)
+    {
+      ROS_ERROR_STREAM("{Parameter Inquiry} ROS Parameter [" << key << "] not found after " << wait_duration << "s, using default value: " << default_val);
+      value = default_val;
+      return false;
+    }
+
+    interval.sleep();
+  }
+  return false;
 }
 
 float current_command[4];
@@ -42,7 +41,7 @@ class UDPPoseStreamer
 public:
   UDPPoseStreamer(const std::string &udp_address,
                   const std::string &udp_port,
-                const std::string &node_name)
+                  const std::string &node_name)
       : dgram_client(LIBSOCKET_IPv4),
         ip_address(udp_address),
         port(udp_port),
@@ -103,7 +102,6 @@ public:
 //   return;
 // }
 
-
 void command_callback(const simulation::VehicleControl &cmd)
 {
   current_command[0] = cmd.Throttle;
@@ -114,7 +112,7 @@ void command_callback(const simulation::VehicleControl &cmd)
 }
 int main(int argc, char **argv)
 {
-  
+
   const std::string command_topic("car_command");
   ros::init(argc, argv, "ROS_Unity_command_Tx");
   ros::NodeHandle n;

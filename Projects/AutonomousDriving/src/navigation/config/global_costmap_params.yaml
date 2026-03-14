@@ -1,14 +1,16 @@
 global_costmap:
-  update_frequency: 1.0
-  static_map: false  # Disable static map
-  rolling_window: false
-  width: 400
-  height: 400
-  origin_x: -200
-  origin_y: -200
-  resolution: 0.25
-  publish_voxel_map: false
+    global_frame: world_map
+    robot_base_frame: base_link
+    update_frequency: 5.0
+    static_map: true # Disable static map
+    rolling_window: false
+    width: 800
+    height: 800
+    origin_x: -200
+    origin_y: -200
+    resolution: 1.0
+    publish_voxel_map: false
 
-  inflation_layer:
-    inflation_radius: 3.5
-    cost_scaling_factor: 2 # Lower values prefer global plans that are further away from obstacles
+    inflation_layer:
+        inflation_radius: 3.5
+        cost_scaling_factor: 2 # Lower values prefer global plans that are further away from obstacles

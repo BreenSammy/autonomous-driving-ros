@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   mav_msgs
   eigen_conversions
   tf_conversions
+  message_generation
   simulation
 )
 
@@ -38,6 +39,6 @@ include_directories(
 
 
 add_executable(controller_node src/controller_node.cpp)
-add_dependencies(controller_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(controller_node ${catkin_EXPORTED_TARGETS} simulation_generate_messages_cpp)
 target_link_libraries(controller_node ${catkin_LIBRARIES})
 

@@ -1,24 +1,31 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(navigation)
 
-find_package(catkin REQUIRED COMPONENTS roscpp nav_msgs tf2_ros tf2_geometry_msgs)
-
-find_package(catkin REQUIRED COMPONENTS 
+# Discover required catkin packages.  We need tf for transform broadcasting
+find_package(catkin REQUIRED COMPONENTS
   roscpp
   nav_msgs
+  tf
   tf2_ros
   tf2_geometry_msgs
   traffic_light_detector
-)
-
-catkin_package(CATKIN_DEPENDS 
-  roscpp 
-  std_msgs 
-  mav_msgs 
-  tf
+  std_msgs
+  mav_msgs
   eigen_conversions
   tf_conversions
-  traffic_light_detector
+)
+
+catkin_package(
+  CATKIN_DEPENDS 
+    roscpp 
+    std_msgs 
+    mav_msgs 
+    tf
+    tf2_ros
+    tf2_geometry_msgs
+    eigen_conversions
+    tf_conversions
+    traffic_light_detector
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
@@ -27,6 +34,13 @@ add_executable(odometry_rotator_node src/odom_rotator_node.cpp)
 target_link_libraries(odometry_rotator_node ${catkin_LIBRARIES})
 
 install(TARGETS odometry_rotator_node
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(odom_publisher_node src/odom_publisher_node.cpp)
+add_dependencies(odom_publisher_node ${catkin_EXPORTED_TARGETS})
+target_link_libraries(odom_publisher_node ${catkin_LIBRARIES})
+
+install(TARGETS odom_publisher_node
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 add_executable(master_node src/master_node.cpp)
@@ -45,11 +59,12 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/resources/waypoints_with_orientations.txt
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-std_msgs
-nav_msgs
-sensor_msgs
-)
+# redundant block removed since we already specified dependencies above
+# find_package(catkin REQUIRED COMPONENTS
+#   std_msgs
+#   nav_msgs
+#   sensor_msgs
+# )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
