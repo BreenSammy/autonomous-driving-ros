@@ -1,6 +1,6 @@
 base_global_planner: "navfn/NavfnROS"
 base_local_planner: "teb_local_planner/TebLocalPlannerROS"
 
-controller_frequency: 50
+controller_frequency: 5
 planner_frequency: 0 # Global Plan is not updated until new goal is published
 clearing_rotation_allowed: false

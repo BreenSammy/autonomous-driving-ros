@@ -20,10 +20,10 @@
 
   <!-- Rotate true_body 90 degrees around z-axis to align x-axis with the car -->
   <node pkg="tf2_ros" type="static_transform_publisher"
-        name="true_body_base_link"      args="0 0 0 0 0 0 /OurCar/INS /base_link" />
+        name="true_body_base_link"      args="-1.35 0 0 0 0 0 /OurCar/INS /base_link" />
 0 0 
   <node pkg="tf2_ros" type="static_transform_publisher"
-        name="camera_to_body"      args="0 0 1.25 1.57 3.14 1.57 /base_link /camera" />
+        name="camera_to_body"      args="2.17 0 0.56 1.57 3.14 1.57 /base_link /camera" />
 
   <node pkg="tf2_ros" type="static_transform_publisher"
         name="sim_left_camera"      args="0 0 0 0 0 0 /camera /OurCar/Sensors/RGBCameraLeft" />
@@ -32,7 +32,7 @@
         name="sim_right_camera"      args="0 0 0 0 0 0 /camera /OurCar/Sensors/RGBCameraRight" />
 
   <node pkg="tf2_ros" type="static_transform_publisher"
-        name="depth_camera_to_body"      args="0 0 1.25 1.57 3.14 1.57 /base_link /depth_camera" />
+        name="depth_camera_to_body"      args="2.17 0 0.56 1.57 3.14 1.57 /base_link /depth_camera" />
 
   <node pkg="tf2_ros" type="static_transform_publisher"
         name="sim_depth_camera"      args="0 0 0 0 0 0 /depth_camera /OurCar/Sensors/DepthCamera" />

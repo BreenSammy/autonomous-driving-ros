@@ -99,8 +99,10 @@ public:
     tf::quaternionMsgToEigen(cur_state.pose.pose.orientation, q);
     R_ = q.toRotationMatrix();
     // Rotate omega
-    omega_ = R_.transpose() * omega_;
-    v_cvl_ = R_.transpose() * v_;
+    // omega_ = R_.transpose() * omega_;
+    omega_ = -omega_;
+    // v_cvl_ = R_.transpose() * v_;
+    v_cvl_ = v_;
   }
 
   // Function to compute the steering angle from desired angular velocity
@@ -127,7 +129,7 @@ public:
     if ((now - last_cmd_vel_time_).toSec() > cmd_vel_timeout_)
     {
       // Timeout exceeded - stop the vehicle
-      ROS_WARN_THROTTLE(1.0, "controller: cmd_vel timeout! Stopping vehicle.");
+      // ROS_WARN_THROTTLE(1.0, "controller: cmd_vel timeout! Stopping vehicle.");
       vd_.setZero();
       desired_angular_velocity_ = 0;
       braking = 1.0; // Apply full brake
@@ -142,9 +144,9 @@ public:
     double control_error = desired_velocity - current_velocity;
 
     // Control gains
-    double k_p = 1;
-    double k_i = 0.5;
-    double k_d = 0.01; // Must be smaller than 1
+    double k_p = 3.0;
+    double k_i = 0.0;
+    double k_d = 0.00; // Must be smaller than 1
 
     double derivative = (control_error - previous_error_) / dt;
     integrator_value_ = integrator_value_ + control_error * dt;
@@ -159,13 +161,16 @@ public:
     // Convert angular velocities to corresponding steering angles
     double current_angular_velocity = omega_[2];
     double current_steering_angle = computeSteeringAngle(current_angular_velocity, current_velocity);
-    double desired_steering_angle = computeSteeringAngle(desired_angular_velocity_, desired_velocity);
+    // double desired_steering_angle = computeSteeringAngle(desired_angular_velocity_, desired_velocity);
+    double desired_steering_angle = desired_angular_velocity_;
     double steering_angle_error = desired_steering_angle - current_steering_angle;
 
+    ROS_WARN_THROTTLE(1.0, "Current steering angle: %.4f, Desired: %.4f", current_steering_angle, desired_steering_angle);
+    ROS_WARN_THROTTLE(1.0, "Current steering angle error: %.4f", steering_angle_error);
     // P controller for turning angle
-    double K_p_omega = 1;
-    double K_i_omega = 0;
-    double K_d_omega = 0; // Must be smaller than 1
+    double K_p_omega = 8.0;
+    double K_i_omega = 0.0;
+    double K_d_omega = 0.0; // Must be smaller than 1
 
     double derivative_steering = (steering_angle_error - previous_steering_error_) / dt;
 
@@ -178,7 +183,7 @@ public:
 
     simulation::VehicleControl msg;
     msg.Throttle = std::tanh(acceleration_output); // Throttle value from -1 to 1, this is the torque applied to the motors
-    msg.Steering = std::tanh(turning_angle);       // Steering value from -1 to 1, in which: positive value <=> turning right
+    msg.Steering = turning_angle;                  // Steering value from -1 to 1, in which: positive value <=> turning right
     msg.Brake = braking;                           // Brake value from 0 to 1, this will apply brake torque to stop the car
     msg.Reserved = 0.0f;                           // Not used!
 
