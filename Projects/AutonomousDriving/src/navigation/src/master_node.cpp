@@ -16,10 +16,11 @@
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
-class MasterNode{
+class MasterNode
+{
   ros::NodeHandle nh_;
   ros::Subscriber current_state_subscriber_;
-  ros::ServiceClient traffic_light_service_ ;
+  ros::ServiceClient traffic_light_service_;
   MoveBaseClient ac_{"/move_base", true};
 
   Eigen::Vector3d position_;
@@ -27,33 +28,36 @@ class MasterNode{
   std::vector<Eigen::Vector3d> waypoints_;
   std::vector<geometry_msgs::Quaternion> orientations_;
 
-  double waypoint_reached_threshold_ {15.0};
+  double waypoint_reached_threshold_{3.0};
   int index_{-1};
   bool done_{false};
   int state_{0};
-  int prev_state_{0};
 
   std::string file_path_;
 
 public:
-  MasterNode(const std::string& file_path) : file_path_(file_path) {
+  MasterNode(const std::string &file_path) : file_path_(file_path)
+  {
     ROS_INFO("Waypoint generator starting");
 
     loadWaypoints();
 
-    while(!ac_.waitForServer(ros::Duration(5.0))){
+    while (!ac_.waitForServer(ros::Duration(5.0)))
+    {
       ROS_INFO("Waiting for the move_base action server to come up");
     }
     current_state_subscriber_ = nh_.subscribe("/odom", 5, &MasterNode::onCurrentState, this);
     traffic_light_service_ = nh_.serviceClient<traffic_light_detector::DetectTrafficLight>("detect_traffic_light");
   }
 
-  void loadWaypoints(){
+  void loadWaypoints()
+  {
     double x, y, z;
     double ox, oy, oz, ow;
 
     std::ifstream file(file_path_, std::ios_base::in);
-    while(file >> x >> y >> z >> ox >> oy >> oz >> ow){
+    while (file >> x >> y >> z >> ox >> oy >> oz >> ow)
+    {
       std::cout << x << " " << y << std::endl;
       auto waypoint = Eigen::Vector3d(x, y, z);
       waypoints_.push_back(waypoint);
@@ -68,10 +72,12 @@ public:
     std::cout << waypoints_.size() << " waypoints loaded" << std::endl;
   }
 
-  void start(std::string frame_id){
+  void start(std::string frame_id)
+  {
     ROS_INFO("Publishing first waypoint");
     index_ = 0;
-    if(index_ < waypoints_.size()){
+    if (index_ < waypoints_.size())
+    {
       target_waypoint_ = waypoints_[index_];
 
       move_base_msgs::MoveBaseGoal goal;
@@ -80,17 +86,19 @@ public:
       goal.target_pose.pose.position.x = (double)target_waypoint_.x();
       goal.target_pose.pose.position.y = (double)target_waypoint_.y();
       goal.target_pose.pose.position.z = (double)target_waypoint_.z();
-      
+
       goal.target_pose.pose.orientation = orientations_[0];
 
       ac_.sendGoal(goal);
     }
   }
 
-  void next(std::string frame_id){
-    ROS_INFO("Waypoint reached"); 
+  void next(std::string frame_id)
+  {
+    ROS_INFO("Waypoint reached");
     index_++;
-    if(index_ < waypoints_.size()){
+    if (index_ < waypoints_.size())
+    {
       target_waypoint_ = waypoints_[index_];
 
       move_base_msgs::MoveBaseGoal goal;
@@ -104,74 +112,76 @@ public:
 
       ac_.sendGoal(goal);
     }
-    else{
+    else
+    {
       done_ = true;
     }
   }
 
-  void onCurrentState(const nav_msgs::Odometry& cur_state){
-    if(done_){
+  void onCurrentState(const nav_msgs::Odometry &cur_state)
+  {
+    if (done_)
+    {
       return;
     }
-      
-    position_ << cur_state.pose.pose.position.x,cur_state.pose.pose.position.y,cur_state.pose.pose.position.z;
-    if(index_<0){
+
+    position_ << cur_state.pose.pose.position.x, cur_state.pose.pose.position.y, cur_state.pose.pose.position.z;
+    if (index_ < 0)
+    {
       start(cur_state.header.frame_id);
     }
     double distance = (target_waypoint_ - position_).norm();
-    if(distance <= waypoint_reached_threshold_){
-      next(cur_state.header.frame_id);
-    }
+
     // Call the traffic light detection service
     traffic_light_detector::DetectTrafficLight srv;
-    if (traffic_light_service_.call(srv)) {
+    if (traffic_light_service_.call(srv))
+    {
       std::string traffic_light_status = srv.response.status;
+      // ROS_WARN_THROTTLE(1.0, "Status: %s", traffic_light_status.c_str());
 
-      if (traffic_light_status == "STOP") {
+      // Red light
+      if (traffic_light_status == "STOP")
+      {
         state_ = 1;
-      } else if (traffic_light_status== "CAUTION") {
+      }
+      // Yellow light
+      else if (traffic_light_status == "CAUTION")
+      {
         state_ = 2;
-      } else if (traffic_light_status == "GO") {
+      }
+      // Green light
+      else if (traffic_light_status == "GO")
+      {
         state_ = 3;
       }
 
-      if (state_ == prev_state_) {
+      // Only publish next waypoint if we are at a green light and within the threshold distance to the current waypoint
+      // This ensures that we stop at red lights and only proceed to the next waypoint when we have a green light and are close enough to the current waypoint
+      if (state_ == 3 && (distance <= waypoint_reached_threshold_))
+      {
+        next(cur_state.header.frame_id);
+      }
+      else
+      {
         return;
       }
-      ROS_INFO("Traffic Light Status: %s", traffic_light_status.c_str());
-
-      if(state_ == 1){
-        ROS_INFO("Red light detected, stopping...");
-        ac_.cancelAllGoals(); // Cancel the current goal to stop the robot
-      } 
-      else if (state_ == 3 || state_ == 2) {
-        ROS_INFO("No red light detected, resuming...");
-        if (index_ < waypoints_.size()) {
-          move_base_msgs::MoveBaseGoal goal;
-          goal.target_pose.header.frame_id = cur_state.header.frame_id;
-          goal.target_pose.header.stamp = ros::Time::now();
-          goal.target_pose.pose.position.x = (double)target_waypoint_.x();
-          goal.target_pose.pose.position.y = (double)target_waypoint_.y();
-          goal.target_pose.pose.position.z = (double)target_waypoint_.z();
-          goal.target_pose.pose.orientation = orientations_[index_];
-          ac_.sendGoal(goal); // Resume navigation by sending the goal again
-        }
-      } 
-        prev_state_ = state_;
     }
-    else {
+    else
+    {
       ROS_ERROR("Failed to call service detect_traffic_light");
     }
   }
 };
 
-int main(int argc, char** argv){
+int main(int argc, char **argv)
+{
   ros::init(argc, argv, "master_node");
   ROS_INFO_NAMED("master_node", "Master starting");
 
-  if (argc < 2) {
-        ROS_ERROR("No file path provided.");
-        return -1;
+  if (argc < 2)
+  {
+    ROS_ERROR("No file path provided.");
+    return -1;
   }
 
   std::string file_path = argv[1];

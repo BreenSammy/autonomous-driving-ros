@@ -98,10 +98,9 @@ public:
     Eigen::Quaterniond q;
     tf::quaternionMsgToEigen(cur_state.pose.pose.orientation, q);
     R_ = q.toRotationMatrix();
-    // Rotate omega
-    // omega_ = R_.transpose() * omega_;
+    // Omega has wrong sign
     omega_ = -omega_;
-    // v_cvl_ = R_.transpose() * v_;
+    // Velocity already in the body frame, so we don't need to rotate it
     v_cvl_ = v_;
   }
 
@@ -129,7 +128,6 @@ public:
     if ((now - last_cmd_vel_time_).toSec() > cmd_vel_timeout_)
     {
       // Timeout exceeded - stop the vehicle
-      // ROS_WARN_THROTTLE(1.0, "controller: cmd_vel timeout! Stopping vehicle.");
       vd_.setZero();
       desired_angular_velocity_ = 0;
       braking = 1.0; // Apply full brake
@@ -165,10 +163,8 @@ public:
     double desired_steering_angle = desired_angular_velocity_;
     double steering_angle_error = desired_steering_angle - current_steering_angle;
 
-    ROS_WARN_THROTTLE(1.0, "Current steering angle: %.4f, Desired: %.4f", current_steering_angle, desired_steering_angle);
-    ROS_WARN_THROTTLE(1.0, "Current steering angle error: %.4f", steering_angle_error);
     // P controller for turning angle
-    double K_p_omega = 8.0;
+    double K_p_omega = 5.0;
     double K_i_omega = 0.0;
     double K_d_omega = 0.0; // Must be smaller than 1
 
@@ -179,20 +175,12 @@ public:
 
     double turning_angle = K_p_omega * steering_angle_error + K_i_omega * integrator_steering_value_ + K_d_omega * derivative_steering;
 
-    // mav_msgs::Actuators msg;
-
     simulation::VehicleControl msg;
+
     msg.Throttle = std::tanh(acceleration_output); // Throttle value from -1 to 1, this is the torque applied to the motors
     msg.Steering = turning_angle;                  // Steering value from -1 to 1, in which: positive value <=> turning right
     msg.Brake = braking;                           // Brake value from 0 to 1, this will apply brake torque to stop the car
     msg.Reserved = 0.0f;                           // Not used!
-
-    // call the traffic light detector service
-    // msg.angular_velocities.resize(4);
-    // msg.angular_velocities[0] = ;  // Acceleration
-    // msg.angular_velocities[1] = ;       // Turning angle
-    // msg.angular_velocities[2] = ;            // Braking
-    // msg.angular_velocities[3] = 0;                   // Other (not used)*/
 
     car_commands_.publish(msg);
   }

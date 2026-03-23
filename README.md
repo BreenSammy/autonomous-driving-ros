@@ -42,3 +42,9 @@ Additionally to the visualization of the Unity simulation a rviz configuration c
 ```
 rviz rviz -d src/car_bringup/rviz/nav.rviz
 ```
+
+# TODO's
+
+- Increase planning performance
+- Shorter turn cycles
+- Lane keeping

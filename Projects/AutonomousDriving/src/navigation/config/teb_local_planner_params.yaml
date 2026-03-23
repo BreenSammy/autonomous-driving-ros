@@ -2,15 +2,15 @@ TebLocalPlannerROS:
     odom_topic: odom
     map_frame: world
     # Robot kinematic constraints
-    max_vel_x: 3.0
+    max_vel_x: 4.0
     max_vel_x_backwards: 1.0
-    max_vel_theta: 4.0
+    max_vel_theta: 5.0
     acc_lim_x: 1.0
     acc_lim_theta: 1.0
 
     min_in_place_vel_theta: 0.1
 
-    min_turning_radius: 5.0
+    min_turning_radius: 2.5
     wheelbase: 2.63
     cmd_angle_instead_rotvel: true
 
@@ -18,9 +18,9 @@ TebLocalPlannerROS:
     footprint_model:
         type: "two_circles"
         front_offset: 2.63 # for type "two_circles"
-        front_radius: 1.0 # for type "two_circles"
+        front_radius: 1.2 # for type "two_circles"
         rear_offset: 0.0 # for type "two_circles"
-        rear_radius: 1.0 # for type "two_circles"
+        rear_radius: 1.2 # for type "two_circles"
 
     # Stopped velocity thresholds
     trans_stopped_vel: 0.05
@@ -91,7 +91,7 @@ TebLocalPlannerROS:
 
     enable_homotopy_class_planning: True
     enable_multithreading: True
-    max_number_classes: 4
+    max_number_classes: 2
     selection_cost_hysteresis: 1.0
     selection_prefer_initial_plan: 0.95
     selection_obst_cost_scale: 1.0
