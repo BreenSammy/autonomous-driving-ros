@@ -1,8 +1,7 @@
-Projects/AutonomousDriving/.catkin_tools
-Projects/AutonomousDriving/.vscode
-Projects/AutonomousDriving/build
-Projects/AutonomousDriving/devel/
-Projects/AutonomousDriving/logs/
-Projects/AutonomousDriving/.catkin_workspace/
-.vscode/
+.build/
+.catkin_tools/
+.catkin_workspace/
+.devel/
 .env/
+.logs/
+.vscode/
