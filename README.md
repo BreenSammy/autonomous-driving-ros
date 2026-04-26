@@ -1,4 +1,3 @@
-
 # Autonomous Driving ROS Project
 
 This project is a complete autonomous driving software stack built with RO. It demonstrates an integrated system capable of autonomous navigation, obstacle avoidance, path planning, and traffic light recognition. The platform simulates a vehicle navigating through a road network in a Unity-based environment, with real-time visualization of sensor data and decision-making processes in RViz.
@@ -24,9 +23,6 @@ This project is a complete autonomous driving software stack built with RO. It d
 - **depth_image_conversion**: Sensor data processing and conversion
 - **simulation**: Unity simulation interface and environment setup
 
-
-
-
 ## Installation
 
 1. Install ROS noetic on Ubuntu 20.04 according to these instructions https://wiki.ros.org/noetic/Installation/Ubuntu. Please install ros-noetic-desktop-full.
@@ -41,7 +37,7 @@ sudo apt install ros-noetic-pointcloud-to-laserscan
 sudo apt install ros-noetic-map-server
 sudo apt install ros-noetic-teb-local-planner
 ```
-4. Build the project with catkin build in the "Projects/AutonomousDriving/" folder with 
+4. Build the project with catkin build in the "autonomous-driving/" folder with 
 ```
 catkin build
 ```

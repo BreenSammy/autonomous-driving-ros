@@ -1,7 +1,7 @@
-.build/
 .catkin_tools/
-.catkin_workspace/
-.devel/
-.env/
-.logs/
 .vscode/
+build/
+catkin_workspace/
+devel/
+logs/
+.env/
