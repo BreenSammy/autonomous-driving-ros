@@ -1,4 +1,31 @@
+
 # Autonomous Driving ROS Project
+
+This project is a complete autonomous driving software stack built with RO. It demonstrates an integrated system capable of autonomous navigation, obstacle avoidance, path planning, and traffic light recognition. The platform simulates a vehicle navigating through a road network in a Unity-based environment, with real-time visualization of sensor data and decision-making processes in RViz.
+
+<img width="598" height="448" alt="drive_" src="https://github.com/user-attachments/assets/f1a583a6-69b8-40a1-a6ba-12c1d2972a51" />
+
+<img width="598" height="448" alt="red-light(1)" src="https://github.com/user-attachments/assets/f0f7ee76-c78d-46ef-a8d6-8829496ae727" />
+
+### Key Features
+
+- **Path Planning & Navigation**: Dynamic path planning with collision avoidance and local path optimization
+- **Traffic Light Detection**: Computer vision-based traffic light recognition and state interpretation
+- **Sensor Integration**: Support for depth sensors and LiDAR-like sensor fusion for environmental awareness
+- **Real-time Visualization**: RViz integration for monitoring sensor outputs and driving behavior
+- **Simulation Environment**: Unity-based simulation for testing and validation
+
+### Project Structure
+
+- **car_bringup**: Main launch configurations and system initialization
+- **controller_pkg**: Vehicle control and command execution
+- **navigation**: Path planning and route management
+- **traffic_light_detector**: Traffic signal recognition and processing
+- **depth_image_conversion**: Sensor data processing and conversion
+- **simulation**: Unity simulation interface and environment setup
+
+
+
 
 ## Installation
 
